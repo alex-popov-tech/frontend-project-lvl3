@@ -2,6 +2,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
   mode: process.env.NODE_ENV || 'development',
+  devtool: 'source-map',
   module: {
     rules: [
       {
@@ -12,7 +13,7 @@ module.exports = {
           options: {
             presets: ['@babel/preset-env'],
           },
-        }, "source-map-loader"],
+        }, 'source-map-loader'],
       },
       { test: /\.css$/, use: ['style-loader', 'css-loader', 'postcss-loader'] },
       {
