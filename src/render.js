@@ -18,33 +18,32 @@ export const renderForm = (formState) => {
   $('.text-muted').after(message);
 };
 
-export const renderSources = (sources, { isFirstFeed }) => {
+export const renderSource = ({ id, title, description }) => {
   const container = $('.feeds');
-  if (isFirstFeed) {
+  if (id === 0) {
     const card = document.createElement('div');
     card.classList.add('card', 'border-0');
     container.append(card);
     const cardBody = document.createElement('div');
     cardBody.classList.add('card-body');
-    cardBody.innerHTML = `<h3 class="card-title h4">${i18next.t('feeds.title')}</h3>`;
+    cardBody.innerHTML = `<h2 class="card-title h4">${i18next.t('feeds.title')}</h2>`;
     card.append(cardBody);
     const feedsContainer = document.createElement('ul');
     feedsContainer.classList.add('list-group', 'border-0', 'rounded-0');
     card.append(feedsContainer);
   }
-  const latestSource = sources[0];
   const feedContainer = document.createElement('li');
   feedContainer.classList.add('list-group-item', 'border-0', 'border-end-0');
   feedContainer.innerHTML = [
-    `<h3 class="h6 m-0">${latestSource.title}</h3>`,
-    `<p class="m-0 small text-black-50">${latestSource.description}</p>`,
+    `<h3 class="h6 m-0">${title}</h3>`,
+    `<p class="m-0 small text-black-50">${description}</p>`,
   ].join('\n');
   $(container, 'ul').after(feedContainer);
 };
 
-export const renderPosts = (postsToAdd, { isFirstFeed }) => {
+export const renderPost = ({ id, title, url }) => {
   const container = $('.posts');
-  if (isFirstFeed) {
+  if (id === 0) {
     const card = document.createElement('div');
     card.classList.add('card', 'border-0');
     container.append(card);
@@ -56,13 +55,37 @@ export const renderPosts = (postsToAdd, { isFirstFeed }) => {
     feedsContainer.classList.add('list-group', 'border-0', 'rounded-0');
     card.append(feedsContainer);
   }
-  postsToAdd.map(({ link, title }) => {
-    const postsContainer = document.createElement('li');
-    postsContainer.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-start', 'border-0', 'border-end-0');
-    postsContainer.innerHTML = [
-      `<a href="${link}" class="fw-bold" data-id="3" target="_blank" rel="noopener noreferrer">${title}</a>`,
-      '<button type="button" class="btn btn-outline-primary btn-sm" data-id="3" data-bs-toggle="modal" data-bs-target="#modal">Просмотр</button>',
-    ].join('\n');
-    return postsContainer;
-  }).forEach((li) => $(container, 'ul').after(li));
+  const postContainer = document.createElement('li');
+  $(container, 'ul').before(postContainer);
+  postContainer.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-start', 'border-0', 'border-end-0');
+  const link = document.createElement('a');
+  link.classList.add('fw-bold');
+  link.href = url;
+  link.target = '_blank';
+  link.rel = 'noopener noreferrer';
+  link.textContent = title;
+  link.dataset.id = id;
+
+  const button = document.createElement('button');
+  button.classList.add('btn', 'btn-outline-primary', 'btn-sm');
+  button.innerText = 'Просмотр';
+  button.dataset.id = id;
+  button.dataset.bsToggle = 'modal';
+  button.dataset.bsTarget = '#modal';
+
+  postContainer.append(link, button);
+};
+
+export const updatePost = (postId) => {
+  const post = $(`a[data-id="${postId}"`);
+  post.classList.replace('fw-bold', 'fw-normal');
+};
+
+export const renderModal = ({ title, url, description }) => {
+  const header = $('#modal .modal-header');
+  header.innerHTML = `<h5 class='modal-title'>${title}</h5>`;
+  const body = $('#modal .modal-body');
+  body.innerHTML = description;
+  const footerReadButton = $('#modal .full-article');
+  footerReadButton.href = url;
 };

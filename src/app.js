@@ -12,7 +12,7 @@ const pullFeed = (feedUrl) => axios.get(`https://hexlet-allorigins.herokuapp.com
   const url = $(rssDom, 'channel link').textContent;
   const description = $(rssDom, 'channel description').textContent;
   const posts = Array.from($$(rssDom, 'channel item'))
-    .map((item) => ({ title: $(item, 'title').textContent, description: $(item, 'description').textContent, url: $(item, 'link').textContent }));
+    .map((item, i) => ({ title: $(item, 'title').textContent, description: $(item, 'description').textContent, url: $(item, 'link').textContent }));
 
   return {
     url, title, description, posts,
@@ -20,19 +20,15 @@ const pullFeed = (feedUrl) => axios.get(`https://hexlet-allorigins.herokuapp.com
 });
 
 const startFeedPulling = (url, interval) => pullFeed(url)
-  .then((feed) => {
-    state.feeds.state = state.feeds.state === 'empty' ? 'filledWithOne' : 'filled';
-
-    if (!state.feeds.sources.find((source) => source.url === feed.url)) {
-      state.feeds.sources.unshift(feed);
+  .then((source) => {
+    if (!state.feeds.sources.find((it) => source.url === it.url)) {
+      state.feeds.sources.unshift(source);
     }
 
-    const newPosts = feed.posts
+    source.posts
       .filter((pulledPost) => !state.feeds.posts
-        .map((existingPost) => existingPost.url).includes(pulledPost.url));
-    if (newPosts.length) {
-      state.feeds.posts.unshift(...newPosts);
-    }
+        .map((existingPost) => existingPost.url).includes(pulledPost.url))
+      .forEach((post) => state.feeds.posts.unshift(post));
   }).finally(() => setTimeout(() => startFeedPulling(url, interval), interval));
 
 export default () => {
@@ -51,5 +47,16 @@ export default () => {
         state.form.state = 'submited';
         startFeedPulling(url, FEED_PULL_INTERVAL);
       });
+  });
+  $('.posts').addEventListener('click', (event) => {
+    const { target: { tagName, dataset: { id, bsToggle } } } = event;
+    if (tagName === 'BUTTON' && bsToggle === 'modal') {
+      event.preventDefault();
+      state.modal = {
+        postId: id,
+        state: 'visible',
+      };
+      state.feeds.posts[parseInt(id, 10)].visited = true;
+    }
   });
 };
