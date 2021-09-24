@@ -6,7 +6,7 @@ import { $, $$ } from './helpers';
 
 const FEED_PULL_INTERVAL = 5 * 1000;
 
-const pullFeed = (feedUrl) => axios.get(`https://hexlet-allorigins.herokuapp.com/get?url=${encodeURIComponent(feedUrl)}`).then(({ data }) => {
+const pullFeed = (feedUrl) => axios.get(`https://hexlet-allorigins.herokuapp.com/get?disableCache=true&url=${encodeURIComponent(feedUrl)}`).then(({ data }) => {
   const rssDom = new DOMParser().parseFromString(data.contents, 'application/xml');
   const title = $(rssDom, 'channel title').textContent;
   const url = $(rssDom, 'channel link').textContent;
