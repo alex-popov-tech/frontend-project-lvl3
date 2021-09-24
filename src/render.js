@@ -68,7 +68,7 @@ export const renderPost = ({ id, title, url }) => {
 
   const button = document.createElement('button');
   button.classList.add('btn', 'btn-outline-primary', 'btn-sm');
-  button.innerText = i18next.t('feeds.posts.viewButton');
+  button.textContent = i18next.t('feeds.posts.viewButton');
   button.dataset.id = id;
   button.dataset.bsToggle = 'modal';
   button.dataset.bsTarget = '#modal';
