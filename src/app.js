@@ -38,14 +38,14 @@ export default () => {
     const urlSchema = string().url().notOneOf(state.feeds.sources.map((it) => it.url));
 
     urlSchema.validate(url)
-      .catch((validationError) => {
-        state.form.message = validationError.errors;
-        state.form.state = 'invalid';
-      })
       .then(() => {
         state.form.message = i18next.t('success');
         state.form.state = 'submited';
         startFeedPulling(url, FEED_PULL_INTERVAL);
+      })
+      .catch((validationError) => {
+        state.form.message = validationError.errors;
+        state.form.state = 'invalid';
       });
   });
   $('.posts').addEventListener('click', (event) => {

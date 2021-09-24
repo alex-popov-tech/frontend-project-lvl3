@@ -2,20 +2,17 @@ import { i18next } from './setup';
 import { $ } from './helpers';
 
 export const renderForm = (formState) => {
-  $('.text-muted').nextElementSibling?.remove();
-  const message = document.createElement('p');
-  message.classList.add('feedback', 'm-0', 'position-absolute', 'small');
-  message.textContent = formState.message;
+  const feedback = $('.feedback');
+  console.log(formState)
   if (formState.state === 'invalid') {
     $('#url').classList.add('is-invalid');
-    message.classList.add('text-danger');
   } else {
     $('#url').classList.remove('is-invalid');
     $('#url').value = '';
     $('#url').focus();
-    message.classList.add('text-success');
+    feedback.classList.add('text-success');
+    feedback.textContent = formState.message;
   }
-  $('.text-muted').after(message);
 };
 
 export const renderSource = ({ id, title, description }) => {
