@@ -5,7 +5,7 @@ export const renderForm = (formState) => {
   $('.text-muted').nextElementSibling?.remove();
   const message = document.createElement('p');
   message.classList.add('feedback', 'm-0', 'position-absolute', 'small');
-  message.innerText = formState.message;
+  message.textContent = formState.message;
   if (formState.state === 'invalid') {
     $('#url').classList.add('is-invalid');
     message.classList.add('text-danger');
