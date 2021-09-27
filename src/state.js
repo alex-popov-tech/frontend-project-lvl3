@@ -17,7 +17,6 @@ const state = {
 };
 
 const watchedState = onChange(state, (path, value, prev, curr) => {
-  console.log(path, value)
   if (value) {
     if (path === 'form.state') {
       renderForm(state.form);

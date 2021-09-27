@@ -22,6 +22,8 @@ const pullFeed = (feedUrl) => axios.get(`https://hexlet-allorigins.herokuapp.com
 const startFeedPulling = (url, interval) => pullFeed(url)
   .then((source) => {
     if (!state.feeds.sources.find((it) => source.url === it.url)) {
+      state.form.message = i18next.t('success');
+      state.form.state = 'submitted';
       state.feeds.sources.unshift(source);
     }
 
@@ -39,8 +41,7 @@ export default () => {
 
     urlSchema.validate(url)
       .then(() => {
-        state.form.message = i18next.t('success');
-        state.form.state = 'submited';
+        state.form.state = 'valid';
         startFeedPulling(url, FEED_PULL_INTERVAL);
       })
       .catch((validationError) => {

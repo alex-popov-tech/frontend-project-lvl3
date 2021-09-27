@@ -3,15 +3,23 @@ import { $ } from './helpers';
 
 export const renderForm = (formState) => {
   const feedback = $('.feedback');
-  console.log(formState)
-  if (formState.state === 'invalid') {
-    $('#url').classList.add('is-invalid');
-  } else {
-    $('#url').classList.remove('is-invalid');
-    $('#url').value = '';
-    $('#url').focus();
-    feedback.classList.add('text-success');
-    feedback.textContent = formState.message;
+  switch (formState.state) {
+    case 'invalid':
+      $('#url').classList.add('is-invalid');
+      $('#url').classList.remove('is-valid');
+      break;
+    case 'valid':
+      $('#url').classList.add('is-valid');
+      $('#url').classList.remove('is-invalid');
+      $('#url').value = '';
+      $('#url').focus();
+      break;
+    case 'submitted':
+      feedback.classList.add('text-success');
+      feedback.textContent = formState.message;
+      break;
+    default:
+      throw new Error(`Unexpected formm state ${formState.state}`);
   }
 };
 
