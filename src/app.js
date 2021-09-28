@@ -42,9 +42,8 @@ const startFeedPulling = (state, url, interval) => axios.get(`https://hexlet-all
     setTimeout(() => startFeedPulling(state, url, interval), interval);
   })
   .catch((err) => {
-    state.form.state = 'invalid';
     state.form.message = i18next.t('errors.invalidUrl');
-    throw err;
+    state.form.state = 'invalid';
   });
 
 export default () => {
