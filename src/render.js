@@ -16,8 +16,6 @@ export const renderForm = (formState) => {
       $('#url').classList.remove('is-invalid');
       $('#url').value = '';
       $('#url').focus();
-      break;
-    case 'submitted':
       feedback.classList.remove('text-danger');
       feedback.classList.add('text-success');
       feedback.textContent = formState.message;

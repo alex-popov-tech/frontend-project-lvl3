@@ -1,4 +1,4 @@
-import { string } from 'yup';
+import { string, object, array } from 'yup';
 import axios from 'axios';
 import { i18next } from './setup';
 import getState from './state';
@@ -6,24 +6,31 @@ import { $, $$ } from './helpers';
 
 const FEED_PULL_INTERVAL = 5 * 1000;
 
-const pullFeed = (feedUrl) => axios.get(`https://hexlet-allorigins.herokuapp.com/get?disableCache=true&url=${encodeURIComponent(feedUrl)}`).then(({ data }) => {
-  const rssDom = new DOMParser().parseFromString(data.contents, 'application/xml');
-  const title = $(rssDom, 'channel title').textContent;
-  const link = $(rssDom, 'channel link').textContent;
-  const description = $(rssDom, 'channel description').textContent;
-  const posts = Array.from($$(rssDom, 'channel item'))
-    .map((item, i) => ({ title: $(item, 'title').textContent, description: $(item, 'description').textContent, url: $(item, 'link').textContent }));
+const startFeedPulling = (state, url, interval) => axios.get(`https://hexlet-allorigins.herokuapp.com/get?disableCache=true&url=${encodeURIComponent(url)}`)
+  .then(({ data }) => {
+    const rssDom = new DOMParser().parseFromString(data.contents, 'application/xml');
+    const title = $(rssDom, 'channel title')?.textContent;
+    const link = $(rssDom, 'channel link')?.textContent;
+    const description = $(rssDom, 'channel description')?.textContent;
+    const posts = Array.from($$(rssDom, 'channel item'))
+      .map((item) => ({ title: $(item, 'title')?.textContent, description: $(item, 'description')?.textContent, url: $(item, 'link')?.textContent }));
 
-  return {
-    url: feedUrl, link, title, description, posts,
-  };
-});
+    const result = {
+      url, link, title, description, posts,
+    };
 
-const startFeedPulling = (state, url, interval) => pullFeed(url)
+    return object().shape({
+      url: string().url().required(),
+      link: string().url().required(),
+      title: string().required(),
+      description: string().required(),
+      posts: array().required(),
+    }).validate(result).then(() => result);
+  })
   .then((source) => {
     if (!state.feeds.sources.find((it) => source.url === it.url)) {
       state.form.message = i18next.t('success');
-      state.form.state = 'submitted';
+      state.form.state = 'valid';
       state.feeds.sources.unshift(source);
     }
 
@@ -31,7 +38,14 @@ const startFeedPulling = (state, url, interval) => pullFeed(url)
       .filter((pulledPost) => !state.feeds.posts
         .map((existingPost) => existingPost.url).includes(pulledPost.url))
       .forEach((post) => state.feeds.posts.unshift(post));
-  }).finally(() => setTimeout(() => startFeedPulling(state, url, interval), interval));
+
+    setTimeout(() => startFeedPulling(state, url, interval), interval);
+  })
+  .catch((err) => {
+    state.form.state = 'invalid';
+    state.form.message = i18next.t('errors.invalidUrl');
+    throw err;
+  });
 
 export default () => {
   const state = getState();
@@ -42,7 +56,6 @@ export default () => {
 
     urlSchema.validate(url)
       .then(() => {
-        state.form.state = 'valid';
         startFeedPulling(state, url, FEED_PULL_INTERVAL);
       })
       .catch((validationError) => {
