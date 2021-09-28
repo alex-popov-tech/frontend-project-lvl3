@@ -1,7 +1,7 @@
 import { string } from 'yup';
 import axios from 'axios';
 import { i18next } from './setup';
-import state from './state';
+import getState from './state';
 import { $, $$ } from './helpers';
 
 const FEED_PULL_INTERVAL = 5 * 1000;
@@ -19,7 +19,7 @@ const pullFeed = (feedUrl) => axios.get(`https://hexlet-allorigins.herokuapp.com
   };
 });
 
-const startFeedPulling = (url, interval) => pullFeed(url)
+const startFeedPulling = (state, url, interval) => pullFeed(url)
   .then((source) => {
     if (!state.feeds.sources.find((it) => source.url === it.url)) {
       state.form.message = i18next.t('success');
@@ -34,6 +34,7 @@ const startFeedPulling = (url, interval) => pullFeed(url)
   }).finally(() => setTimeout(() => startFeedPulling(url, interval), interval));
 
 export default () => {
+  const state = getState();
   $('form').addEventListener('submit', (event) => {
     event.preventDefault();
     const url = new FormData(event.target).get('url');
@@ -42,7 +43,7 @@ export default () => {
     urlSchema.validate(url)
       .then(() => {
         state.form.state = 'valid';
-        startFeedPulling(url, FEED_PULL_INTERVAL);
+        startFeedPulling(state, url, FEED_PULL_INTERVAL);
       })
       .catch((validationError) => {
         state.form.message = validationError.errors;
