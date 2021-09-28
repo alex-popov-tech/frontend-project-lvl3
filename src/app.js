@@ -9,13 +9,13 @@ const FEED_PULL_INTERVAL = 5 * 1000;
 const pullFeed = (feedUrl) => axios.get(`https://hexlet-allorigins.herokuapp.com/get?disableCache=true&url=${encodeURIComponent(feedUrl)}`).then(({ data }) => {
   const rssDom = new DOMParser().parseFromString(data.contents, 'application/xml');
   const title = $(rssDom, 'channel title').textContent;
-  const url = $(rssDom, 'channel link').textContent;
+  const link = $(rssDom, 'channel link').textContent;
   const description = $(rssDom, 'channel description').textContent;
   const posts = Array.from($$(rssDom, 'channel item'))
     .map((item, i) => ({ title: $(item, 'title').textContent, description: $(item, 'description').textContent, url: $(item, 'link').textContent }));
 
   return {
-    url, title, description, posts,
+    url: feedUrl, link, title, description, posts,
   };
 });
 
@@ -31,7 +31,7 @@ const startFeedPulling = (state, url, interval) => pullFeed(url)
       .filter((pulledPost) => !state.feeds.posts
         .map((existingPost) => existingPost.url).includes(pulledPost.url))
       .forEach((post) => state.feeds.posts.unshift(post));
-  }).finally(() => setTimeout(() => startFeedPulling(url, interval), interval));
+  }).finally(() => setTimeout(() => startFeedPulling(state, url, interval), interval));
 
 export default () => {
   const state = getState();
@@ -46,7 +46,7 @@ export default () => {
         startFeedPulling(state, url, FEED_PULL_INTERVAL);
       })
       .catch((validationError) => {
-        state.form.message = validationError.errors;
+        state.form.message = validationError.errors[0];
         state.form.state = 'invalid';
       });
   });

@@ -7,6 +7,9 @@ export const renderForm = (formState) => {
     case 'invalid':
       $('#url').classList.add('is-invalid');
       $('#url').classList.remove('is-valid');
+      feedback.classList.add('text-danger');
+      feedback.classList.remove('text-success');
+      feedback.textContent = formState.message;
       break;
     case 'valid':
       $('#url').classList.add('is-valid');
@@ -15,6 +18,7 @@ export const renderForm = (formState) => {
       $('#url').focus();
       break;
     case 'submitted':
+      feedback.classList.remove('text-danger');
       feedback.classList.add('text-success');
       feedback.textContent = formState.message;
       break;
