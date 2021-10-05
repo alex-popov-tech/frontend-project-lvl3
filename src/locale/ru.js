@@ -10,7 +10,8 @@ export const ru = {
     errors: {
       url: 'Ссылка должна быть валидным URL',
       exists: 'RSS уже существует',
-      invalidUrl: 'Ресурс не содержит валидный RSS',
+      content: 'Ресурс не содержит валидный RSS',
+      network: 'Ошибка сети',
     },
     success: 'RSS успешно загружен',
   },

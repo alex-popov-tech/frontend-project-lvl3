@@ -21,7 +21,7 @@ export default () => {
 
   const watchedState = onChange(state, (path, value, prev, curr) => {
     if (value) {
-      if (path === 'form.state') {
+      if (path === 'form') {
         renderForm(state.form);
       }
       if (path === 'feeds.sources') {
