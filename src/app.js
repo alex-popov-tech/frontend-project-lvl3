@@ -64,38 +64,9 @@ const startPulling = (state, url, interval) => axios.get(`https://hexlet-allorig
           .forEach((post) => state.feeds.posts.unshift(post));
 
         setTimeout(() => startPulling(state, url, interval), interval);
-      });
+      })
+      .catch(() => { /* NOP */ });
   });
-
-// const tryStartFeedPulling = (state, url, interval) => validateUrl(state, url)
-//   .then(() => axios.get(`https://hexlet-allorigins.herokuapp.com/get?disableCache=true&url=${encodeURIComponent(url)}`)
-//     .catch((networkError) => {
-//       state.form = {
-//         message: i18next.t('errors.network'),
-//         state: 'invalid',
-//       };
-//       setTimeout(() => tryStartFeedPulling(state, url, interval), interval);
-//       throw networkError;
-//     }))
-//   .then(({ data }) => {
-//     const rssDom = new DOMParser().parseFromString(data.contents, 'application/xml');
-//     const title = $(rssDom, 'channel title')?.textContent;
-//     const link = $(rssDom, 'channel link')?.textContent;
-//     const description = $(rssDom, 'channel description')?.textContent;
-//     const posts = Array.from($$(rssDom, 'channel item'))
-//       .map((item) => ({ title: $(item, 'title')?.textContent, description: $(item, 'description')?.textContent, url: $(item, 'link')?.textContent }));
-
-//     const result = {
-//       url, link, title, description, posts,
-//     };
-
-//     source.posts
-//       .filter((pulledPost) => !state.feeds.posts
-//         .map((existingPost) => existingPost.url).includes(pulledPost.url))
-//       .forEach((post) => state.feeds.posts.unshift(post));
-
-//     setTimeout(() => tryStartFeedPulling(state, url, interval), interval);
-//   });
 
 export default () => {
   const state = getState();
