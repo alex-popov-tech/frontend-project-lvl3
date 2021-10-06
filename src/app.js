@@ -65,7 +65,6 @@ const startPulling = (state, url, interval) => axios.get(`https://hexlet-allorig
 
         setTimeout(() => startPulling(state, url, interval), interval);
       })
-      .catch(() => { /* NOP */ });
   });
 
 export default () => {
@@ -74,7 +73,8 @@ export default () => {
     event.preventDefault();
     const url = new FormData(event.target).get('url');
     validateUrl(state, url)
-      .then(() => startPulling(state, url, FEED_PULL_INTERVAL));
+      .then(() => startPulling(state, url, FEED_PULL_INTERVAL))
+      .catch(() => { /* NOP */ });
   });
   $('.posts').addEventListener('click', (event) => {
     const { target: { tagName, dataset: { id, bsToggle } } } = event;
