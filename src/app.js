@@ -71,6 +71,9 @@ export default () => {
   const state = getState();
   $('form').addEventListener('submit', (event) => {
     event.preventDefault();
+    state.form = {
+      state: 'submitted',
+    };
     const url = new FormData(event.target).get('url');
     validateUrl(state, url)
       .then(() => startPulling(state, url, FEED_PULL_INTERVAL))

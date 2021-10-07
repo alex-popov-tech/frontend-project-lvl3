@@ -4,7 +4,13 @@ import { $ } from './helpers';
 export const renderForm = (formState) => {
   const feedback = $('.feedback');
   switch (formState.state) {
+    case 'submitted':
+      $('#url').readonly = true;
+      $('button[type="submit"]').disabled = true;
+      break;
     case 'invalid':
+      $('#url').readonly = false;
+      $('button[type="submit"]').disabled = false;
       $('#url').classList.add('is-invalid');
       $('#url').classList.remove('is-valid');
       feedback.classList.add('text-danger');
@@ -12,6 +18,8 @@ export const renderForm = (formState) => {
       feedback.textContent = formState.message;
       break;
     case 'valid':
+      $('#url').readonly = false;
+      $('button[type="submit"]').disabled = false;
       $('#url').classList.add('is-valid');
       $('#url').classList.remove('is-invalid');
       $('#url').value = '';
@@ -21,7 +29,7 @@ export const renderForm = (formState) => {
       feedback.textContent = formState.message;
       break;
     default:
-      throw new Error(`Unexpected formm state ${formState.state}`);
+      throw new Error(`Unexpected form state ${formState.state}`);
   }
 };
 
