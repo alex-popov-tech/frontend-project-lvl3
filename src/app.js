@@ -15,7 +15,7 @@ const validateUrl = (state, url) => string().url().notOneOf(state.feeds.sources.
     throw validationError;
   });
 
-const startPulling = (state, url, interval) => axios.get(`https://hexlet-allorigins.herokuapp.com/get?disableCache=true&url=${encodeURIComponent(url)}`)
+const startPulling = (state, url, interval) => axios.get(`https://hexlet-allorigins.herokuapp.com/get?url=${encodeURIComponent(url)}&disableCache=true`)
   .catch((networkError) => {
     state.form = {
       message: i18next.t('errors.network'),
