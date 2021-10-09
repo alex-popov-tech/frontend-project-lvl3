@@ -1,6 +1,6 @@
 import { string, object, array } from 'yup';
 import axios from 'axios';
-import { i18next } from './setup';
+import i18next from './setup';
 import getState from './state';
 import { $, $$ } from './helpers';
 

@@ -1,4 +1,4 @@
-import { i18next } from './setup';
+import i18next from './setup';
 import { $ } from './helpers';
 
 export const renderForm = (formState) => {
