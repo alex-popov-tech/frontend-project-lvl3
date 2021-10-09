@@ -1,4 +1,4 @@
-export const ru = {
+export default {
   translation: {
     feeds: {
       title: 'Фиды',
