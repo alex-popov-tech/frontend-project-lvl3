@@ -61,6 +61,7 @@ const startPulling = (state, url, interval) => axios.get(`https://hexlet-allorig
         source.posts
           .filter((pulledPost) => !state.feeds.posts
             .map((existingPost) => existingPost.url).includes(pulledPost.url))
+          .reverse()
           .forEach((post) => state.feeds.posts.unshift(post));
 
         setTimeout(() => startPulling(state, url, interval), interval);

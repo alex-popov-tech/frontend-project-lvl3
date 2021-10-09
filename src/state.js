@@ -29,8 +29,9 @@ export default () => {
         renderSource(sourceData);
       }
       if (path === 'feeds.posts') {
-        const postData = { id: state.feeds.posts.length - 1, ...value[0] };
-        renderPost(postData);
+        const post = value[0];
+        post.id = state.feeds.posts.length - 1;
+        renderPost(post);
       }
       if (path.match(/feeds.posts.\d.visited/)) {
         const postId = parseInt(path.match(/\d/)[0], 10);
@@ -38,7 +39,7 @@ export default () => {
       }
       if (path === 'modal') {
         const modal = value;
-        const post = state.feeds.posts.find((_, id) => id === parseInt(modal.postId, 10));
+        const post = state.feeds.posts.find(({ id }) => id === parseInt(modal.postId, 10));
         renderModal(post);
       }
     }

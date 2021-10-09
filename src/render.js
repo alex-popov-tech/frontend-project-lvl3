@@ -71,7 +71,7 @@ export const renderPost = ({ id, title, url }) => {
     card.append(feedsContainer);
   }
   const postContainer = document.createElement('li');
-  $(container, 'ul').before(postContainer);
+  $(container, 'ul').prepend(postContainer);
   postContainer.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-start', 'border-0', 'border-end-0');
   const link = document.createElement('a');
   link.classList.add('fw-bold');
@@ -82,6 +82,7 @@ export const renderPost = ({ id, title, url }) => {
   link.dataset.id = id;
 
   const button = document.createElement('button');
+  button.type = 'button';
   button.classList.add('btn', 'btn-outline-primary', 'btn-sm');
   button.textContent = i18next.t('feeds.posts.viewButton');
   button.dataset.id = id;
