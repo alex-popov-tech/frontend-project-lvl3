@@ -1,5 +1,5 @@
 import { setLocale } from 'yup';
-import { i18next } from './locale';
+import i18next from './locale';
 
 setLocale({
   string: {
@@ -7,7 +7,7 @@ setLocale({
   },
   mixed: {
     notOneOf: i18next.t('errors.exists'),
-  }
+  },
 });
 
-export { i18next };
+export default i18next;

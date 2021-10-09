@@ -6,7 +6,8 @@ import { $, $$ } from './helpers';
 
 const FEED_PULL_INTERVAL = 10 * 1000;
 
-const validateUrl = (state, url) => string().url().notOneOf(state.feeds.sources.map((it) => it.url)).validate(url)
+const validateUrl = (state, url) => string().url().notOneOf(state.feeds.sources.map((it) => it.url))
+  .validate(url)
   .catch((validationError) => {
     state.form = {
       message: validationError.errors[0],

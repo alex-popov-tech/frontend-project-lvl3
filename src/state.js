@@ -19,7 +19,7 @@ export default () => {
     },
   };
 
-  const watchedState = onChange(state, (path, value, prev, curr) => {
+  const watchedState = onChange(state, (path, value) => {
     if (value) {
       if (path === 'form') {
         renderForm(state.form);
