@@ -5,11 +5,11 @@ export const renderForm = (formState) => {
   const feedback = $('.feedback');
   switch (formState.state) {
     case 'submitted':
-      $('#url').setAttribute('readonly', true);
+      $('#url').readOnly = true;
       $('button[type="submit"]').disabled = true;
       break;
     case 'invalid':
-      $('#url').setAttribute('readonly', false);
+      $('#url').readOnly = false;
       $('button[type="submit"]').disabled = false;
       $('#url').classList.add('is-invalid');
       $('#url').classList.remove('is-valid');
@@ -18,7 +18,7 @@ export const renderForm = (formState) => {
       feedback.textContent = formState.message;
       break;
     case 'valid':
-      $('#url').setAttribute('readonly', false);
+      $('#url').readOnly = false;
       $('button[type="submit"]').disabled = false;
       $('#url').classList.add('is-valid');
       $('#url').classList.remove('is-invalid');

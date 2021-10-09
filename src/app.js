@@ -64,7 +64,7 @@ const startPulling = (state, url, interval) => axios.get(`https://hexlet-allorig
           .forEach((post) => state.feeds.posts.unshift(post));
 
         setTimeout(() => startPulling(state, url, interval), interval);
-      })
+      });
   });
 
 export default () => {
@@ -73,6 +73,7 @@ export default () => {
     event.preventDefault();
     state.form = {
       state: 'submitted',
+      message: '',
     };
     const url = new FormData(event.target).get('url');
     validateUrl(state, url)
