@@ -15,7 +15,7 @@ export const renderForm = (formState) => {
       $('#url').classList.remove('is-valid');
       feedback.classList.add('text-danger');
       feedback.classList.remove('text-success');
-      feedback.textContent = formState.message;
+      feedback.textContent = i18next.t(formState.message);
       break;
     case 'valid':
       $('#url').readOnly = false;
@@ -26,7 +26,7 @@ export const renderForm = (formState) => {
       $('#url').focus();
       feedback.classList.remove('text-danger');
       feedback.classList.add('text-success');
-      feedback.textContent = formState.message;
+      feedback.textContent = i18next.t(formState.message);
       break;
     default:
       throw new Error(`Unexpected form state ${formState.state}`);

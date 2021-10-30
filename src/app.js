@@ -1,6 +1,5 @@
-import { string, object, array } from 'yup';
+import { string } from 'yup';
 import axios from 'axios';
-import i18next from './setup';
 import getState from './state';
 import { $, $$ } from './helpers';
 
@@ -24,7 +23,7 @@ const startPulling = (state, url, interval) =>
     .get(`https://hexlet-allorigins.herokuapp.com/get?url=${encodeURIComponent(url)}&disableCache=true`)
     .catch((networkError) => {
       state.form = {
-        message: i18next.t('errors.network'),
+        message: 'errors.network',
         state: 'invalid',
       };
       setTimeout(() => startPulling(state, url, interval), interval);
@@ -53,7 +52,7 @@ const startPulling = (state, url, interval) =>
         return result;
       } catch (contentError) {
         state.form = {
-          message: i18next.t('errors.content'),
+          message: 'errors.content',
           state: 'invalid',
         };
         throw contentError;
@@ -62,7 +61,7 @@ const startPulling = (state, url, interval) =>
     .then((source) => {
       if (!state.sources.find((it) => source.url === it.url)) {
         state.form = {
-          message: i18next.t('success'),
+          message: 'success',
           state: 'valid',
         };
         state.sources.unshift(source);
