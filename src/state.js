@@ -1,7 +1,5 @@
 import onChange from 'on-change';
-import {
-  renderSource, renderForm, renderPost, updatePost, renderModal,
-} from './render';
+import { renderSource, renderForm, renderPost, updatePost, renderModal } from './render';
 
 export default () => {
   const state = {
@@ -9,10 +7,11 @@ export default () => {
       state: 'initial',
       message: '',
     },
-    feeds: {
-      sources: [],
-      posts: [],
-    },
+    sources: [],
+    // post data, sourceId
+    posts: [],
+    //  { postId }
+    visitedPosts: [],
     modal: {
       state: 'hidden',
       postId: 0,
@@ -24,22 +23,22 @@ export default () => {
       if (path === 'form') {
         renderForm(state.form);
       }
-      if (path === 'feeds.sources') {
-        const sourceData = { id: state.feeds.sources.length - 1, ...value[0] };
+      if (path === 'sources') {
+        const sourceData = { id: state.sources.length - 1, ...value[0] };
         renderSource(sourceData);
       }
-      if (path === 'feeds.posts') {
+      if (path === 'posts') {
         const post = value[0];
-        post.id = state.feeds.posts.length - 1;
+        post.id = state.posts.length - 1;
         renderPost(post);
       }
-      if (path.match(/feeds.posts.\d.visited/)) {
-        const postId = parseInt(path.match(/\d/)[0], 10);
+      if (path === 'visitedPosts') {
+        const { postId } = value[0];
         updatePost(postId);
       }
       if (path === 'modal') {
         const modal = value;
-        const post = state.feeds.posts.find(({ id }) => id === parseInt(modal.postId, 10));
+        const post = state.posts.find(({ id }) => id === parseInt(modal.postId, 10));
         renderModal(post);
       }
     }
