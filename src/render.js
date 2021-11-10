@@ -1,29 +1,31 @@
-import i18next from './setup';
+import i18next from 'i18next';
 import { $ } from './helpers';
 
 export const renderForm = (formState) => {
   const feedback = $('.feedback');
+  const url = $('#url');
+  const submit = $('button[type="submit"]');
   switch (formState.state) {
     case 'submitted':
-      $('#url').readOnly = true;
-      $('button[type="submit"]').disabled = true;
+      url.readOnly = true;
+      submit.disabled = true;
       break;
     case 'invalid':
-      $('#url').readOnly = false;
-      $('button[type="submit"]').disabled = false;
-      $('#url').classList.add('is-invalid');
-      $('#url').classList.remove('is-valid');
+      url.readOnly = false;
+      submit.disabled = false;
+      url.classList.add('is-invalid');
+      url.classList.remove('is-valid');
       feedback.classList.add('text-danger');
       feedback.classList.remove('text-success');
       feedback.textContent = i18next.t(formState.message);
       break;
     case 'valid':
-      $('#url').readOnly = false;
-      $('button[type="submit"]').disabled = false;
-      $('#url').classList.add('is-valid');
-      $('#url').classList.remove('is-invalid');
-      $('#url').value = '';
-      $('#url').focus();
+      url.readOnly = false;
+      submit.disabled = false;
+      url.classList.add('is-valid');
+      url.classList.remove('is-invalid');
+      url.value = '';
+      url.focus();
       feedback.classList.remove('text-danger');
       feedback.classList.add('text-success');
       feedback.textContent = i18next.t(formState.message);
@@ -35,7 +37,7 @@ export const renderForm = (formState) => {
 
 export const renderSource = ({ id, title, description }) => {
   const container = $('.feeds');
-  if (id === 0) {
+  if (id === '0') {
     const card = document.createElement('div');
     card.classList.add('card', 'border-0');
     container.append(card);
@@ -58,7 +60,7 @@ export const renderSource = ({ id, title, description }) => {
 
 export const renderPost = ({ id, title, url }) => {
   const container = $('.posts');
-  if (id === 0) {
+  if (id === '0') {
     const card = document.createElement('div');
     card.classList.add('card', 'border-0');
     container.append(card);
@@ -72,7 +74,14 @@ export const renderPost = ({ id, title, url }) => {
   }
   const postContainer = document.createElement('li');
   $(container, 'ul').prepend(postContainer);
-  postContainer.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-start', 'border-0', 'border-end-0');
+  postContainer.classList.add(
+    'list-group-item',
+    'd-flex',
+    'justify-content-between',
+    'align-items-start',
+    'border-0',
+    'border-end-0'
+  );
   const link = document.createElement('a');
   link.classList.add('fw-bold');
   link.href = url;
