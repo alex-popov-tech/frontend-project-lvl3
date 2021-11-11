@@ -1,6 +1,6 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle';
-import { string } from 'yup';
+import { string, mixed } from 'yup';
 import axios from 'axios';
 import getState from './state';
 import { $, $$ } from './helpers';
@@ -11,8 +11,22 @@ const FEED_PULL_INTERVAL = 10 * 1000;
 const validateUrl = (url, existingUrls) =>
   string()
     .url()
-    .notOneOf(existingUrls.map((it) => it.url))
-    .validate(url);
+    .validate(url)
+    .then(() =>
+      mixed()
+        .notOneOf(existingUrls.map((it) => new URL(it).origin))
+        .validate(new URL(url).origin)
+    )
+    .then(
+      (args) => {
+        console.log(`then called with ${args}`);
+        return url;
+      },
+      (err) => {
+        console.log(`catch called with ${err}`);
+        throw err;
+      }
+    );
 
 const parseRssContent = (content) => {
   const rssDom = new DOMParser().parseFromString(content, 'application/xml');
@@ -33,59 +47,24 @@ const parseRssContent = (content) => {
   };
 };
 
-const startPulling = (state, url, interval) =>
+const pullRss = (url) =>
   axios
     .get(`https://hexlet-allorigins.herokuapp.com/get?url=${encodeURIComponent(url)}&disableCache=true`)
-    .then(({ data: { contents } }) => ({ ...parseRssContent(contents) }))
-    .catch((error) => {
-      if (axios.isAxiosError(error)) {
-        state.form = {
-          message: 'errors.network',
-          state: 'invalid',
-        };
-      }
-      state.form = {
-        message: 'errors.content',
-        state: 'invalid',
-      };
-    })
+    .then(({ data: { contents } }) => contents);
+
+const getNewPosts = (pulledItems, existingItems) =>
+  pulledItems.filter((pulledItem) => !existingItems.map(({ link }) => link).includes(pulledItem.link));
+
+const startUpdatingFeed = (state, url) =>
+  pullRss(url)
+    .then(parseRssContent)
     .then((source) => {
-      if (!state.sources.find((it) => source.link === it.link)) {
-        state.form = {
-          message: 'success',
-          state: 'valid',
-        };
-        state.sources.unshift(source);
-      }
-
-      const newPosts = source.items
-        .filter((pulledPost) => !state.items.map((existingPost) => existingPost.url).includes(pulledPost.url))
-        .reverse();
-      newPosts.forEach((post) => state.items.unshift(post));
-
-      setTimeout(() => startPulling(state, url, interval), interval);
+      const newPosts = getNewPosts(source.items, state.items);
+      newPosts.reverse().forEach((item) => state.items.unshift(item));
+      setTimeout(() => startUpdatingFeed(state, url), FEED_PULL_INTERVAL);
     });
 
 const addListeners = (state) => {
-  $('form').addEventListener('submit', (event) => {
-    event.preventDefault();
-    state.form = {
-      state: 'submitted',
-      message: '',
-    };
-    const url = new FormData(event.target).get('url');
-    validateUrl(
-      url,
-      state.sources.map(({ url: existingUrl }) => existingUrl)
-    )
-      .catch((validationError) => {
-        state.form = {
-          message: validationError.errors[0],
-          state: 'invalid',
-        };
-      })
-      .then(() => startPulling(state, url, FEED_PULL_INTERVAL));
-  });
   $('.posts').addEventListener('click', (event) => {
     event.preventDefault();
     const {
@@ -101,6 +80,50 @@ const addListeners = (state) => {
         state: 'visible',
       };
     }
+  });
+
+  $('form').addEventListener('submit', (event) => {
+    event.preventDefault();
+    state.form = {
+      state: 'submitted',
+      message: '',
+    };
+    const url = new FormData(event.target).get('url');
+    const existingUrls = state.sources.map(({ link }) => link);
+    validateUrl(url, existingUrls)
+      .then(() => pullRss(url))
+      .then((content) => parseRssContent(content))
+      .then((source) => {
+        if (!state.sources.find((it) => source.link === it.link)) {
+          state.form = {
+            message: 'success',
+            state: 'valid',
+          };
+          state.sources.unshift(source);
+        }
+        const newPosts = getNewPosts(source.items, state.items);
+        newPosts.reverse().forEach((item) => state.items.unshift(item));
+
+        setTimeout(() => startUpdatingFeed(state, url), FEED_PULL_INTERVAL);
+      })
+      .catch((error) => {
+        if (axios.isAxiosError(error)) {
+          state.form = {
+            message: 'errors.network',
+            state: 'invalid',
+          };
+        } else if (error.name === 'ValidationError') {
+          state.form = {
+            message: error.errors[0],
+            state: 'invalid',
+          };
+        } else {
+          state.form = {
+            message: 'errors.content',
+            state: 'invalid',
+          };
+        }
+      });
   });
 };
 

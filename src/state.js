@@ -46,8 +46,6 @@ export default () => {
           renderModal(post);
           break;
         }
-        default:
-          throw new Error(`Unexpected state mutation - ${path}:${value}`);
       }
     }
   });

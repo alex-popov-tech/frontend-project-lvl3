@@ -106,11 +106,11 @@ export const updatePost = (postId) => {
   post.classList.replace('fw-bold', 'fw-normal');
 };
 
-export const renderModal = ({ title, url, description }) => {
+export const renderModal = ({ title, link, description }) => {
   const header = $('#modal .modal-header');
   header.innerHTML = `<h5 class='modal-title'>${title}</h5>`;
   const body = $('#modal .modal-body');
   body.innerHTML = description;
   const footerReadButton = $('#modal .full-article');
-  footerReadButton.href = url;
+  footerReadButton.href = link;
 };
