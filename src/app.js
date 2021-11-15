@@ -16,16 +16,6 @@ const validateUrl = (url, existingUrls) =>
       mixed()
         .notOneOf(existingUrls.map((it) => new URL(it).origin))
         .validate(new URL(url).origin)
-    )
-    .then(
-      (args) => {
-        console.log(`then called with ${args}`);
-        return url;
-      },
-      (err) => {
-        console.log(`catch called with ${err}`);
-        throw err;
-      }
     );
 
 const parseRssContent = (content) => {
@@ -57,8 +47,8 @@ const getNewPosts = (pulledItems, existingItems) =>
 
 const startUpdatingFeed = (state, url) =>
   pullRss(url)
-    .then(parseRssContent)
-    .then((source) => {
+    .then((content) => {
+      const source = parseRssContent(content);
       const newPosts = getNewPosts(source.items, state.items);
       newPosts.reverse().forEach((item) => state.items.unshift(item));
       setTimeout(() => startUpdatingFeed(state, url), FEED_PULL_INTERVAL);

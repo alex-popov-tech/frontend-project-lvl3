@@ -58,7 +58,7 @@ export const renderSource = ({ id, title, description }) => {
   $(container, 'ul').after(feedContainer);
 };
 
-export const renderPost = ({ id, title, url }) => {
+export const renderPost = ({ id, title, link: href }) => {
   const container = $('.posts');
   if (id === '0') {
     const card = document.createElement('div');
@@ -84,7 +84,7 @@ export const renderPost = ({ id, title, url }) => {
   );
   const link = document.createElement('a');
   link.classList.add('fw-bold');
-  link.href = url;
+  link.href = href;
   link.target = '_blank';
   link.rel = 'noopener noreferrer';
   link.textContent = title;
