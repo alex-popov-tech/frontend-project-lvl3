@@ -1,10 +1,7 @@
+import onChange from 'on-change';
 import i18next from 'i18next';
-import { $ } from './helpers';
 
-export const renderForm = (formState) => {
-  const feedback = $('.feedback');
-  const url = $('#url');
-  const submit = $('button[type="submit"]');
+const updateForm = ({ feedback, url, submit }, formState) => {
   switch (formState.state) {
     case 'submitted':
       url.readOnly = true;
@@ -35,8 +32,7 @@ export const renderForm = (formState) => {
   }
 };
 
-export const renderSource = ({ id, title, description }) => {
-  const container = $('.feeds');
+const renderFeed = (container, { id, title, description }) => {
   if (id === '0') {
     const card = document.createElement('div');
     card.classList.add('card', 'border-0');
@@ -45,9 +41,9 @@ export const renderSource = ({ id, title, description }) => {
     cardBody.classList.add('card-body');
     cardBody.innerHTML = `<h2 class="card-title h4">${i18next.t('feeds.title')}</h2>`;
     card.append(cardBody);
-    const feedsContainer = document.createElement('ul');
-    feedsContainer.classList.add('list-group', 'border-0', 'rounded-0');
-    card.append(feedsContainer);
+    const feedsList = document.createElement('ul');
+    feedsList.classList.add('list-group', 'border-0', 'rounded-0');
+    card.append(feedsList);
   }
   const feedContainer = document.createElement('li');
   feedContainer.classList.add('list-group-item', 'border-0', 'border-end-0');
@@ -55,26 +51,25 @@ export const renderSource = ({ id, title, description }) => {
     `<h3 class="h6 m-0">${title}</h3>`,
     `<p class="m-0 small text-black-50">${description}</p>`,
   ].join('\n');
-  $(container, 'ul').after(feedContainer);
+  container.querySelector('ul').after(feedContainer);
 };
 
-export const renderPost = ({ id, title, link: href }) => {
-  const container = $('.posts');
+const renderItem = (container, { id, title, link: href }) => {
   if (id === '0') {
     const card = document.createElement('div');
     card.classList.add('card', 'border-0');
     container.append(card);
     const cardBody = document.createElement('div');
     cardBody.classList.add('card-body');
-    cardBody.innerHTML = `<h3 class="card-title h4">${i18next.t('feeds.posts.title')}</h3>`;
+    cardBody.innerHTML = `<h3 class="card-title h4">${i18next.t('feeds.items.title')}</h3>`;
     card.append(cardBody);
     const feedsContainer = document.createElement('ul');
     feedsContainer.classList.add('list-group', 'border-0', 'rounded-0');
     card.append(feedsContainer);
   }
-  const postContainer = document.createElement('li');
-  $(container, 'ul').prepend(postContainer);
-  postContainer.classList.add(
+  const itemContainer = document.createElement('li');
+  container.querySelector('ul').prepend(itemContainer);
+  itemContainer.classList.add(
     'list-group-item',
     'd-flex',
     'justify-content-between',
@@ -93,24 +88,59 @@ export const renderPost = ({ id, title, link: href }) => {
   const button = document.createElement('button');
   button.type = 'button';
   button.classList.add('btn', 'btn-outline-primary', 'btn-sm');
-  button.textContent = i18next.t('feeds.posts.viewButton');
+  button.textContent = i18next.t('feeds.items.viewButton');
   button.dataset.id = id;
   button.dataset.bsToggle = 'modal';
   button.dataset.bsTarget = '#modal';
 
-  postContainer.append(link, button);
+  itemContainer.append(link, button);
 };
 
-export const updatePost = (postId) => {
-  const post = $(`a[data-id="${postId}"`);
+const updateItem = (container, itemId) => {
+  const post = container.querySelector(`a[data-id="${itemId}"`);
   post.classList.replace('fw-bold', 'fw-normal');
 };
 
-export const renderModal = ({ title, link, description }) => {
-  const header = $('#modal .modal-header');
+const renderModal = ({ header, body, footerButton }, { title, link, description }) => {
   header.innerHTML = `<h5 class='modal-title'>${title}</h5>`;
-  const body = $('#modal .modal-body');
   body.innerHTML = description;
-  const footerReadButton = $('#modal .full-article');
-  footerReadButton.href = link;
+  footerButton.href = link;
+};
+
+export default (elements, state) => {
+  const { modal, form, feeds, items } = elements;
+
+  return onChange(state, (path, value, prev, apply) => {
+    if (value) {
+      switch (path) {
+        case 'form': {
+          updateForm(elements.form, state.form);
+          break;
+        }
+        case 'feeds': {
+          const feed = apply.args[0];
+          feed.id = `${state.feeds.length - 1}`;
+          renderFeed(elements.feeds, feed);
+          break;
+        }
+        case 'items': {
+          const item = apply.args[0];
+          item.id = `${state.items.length - 1}`;
+          renderItem(elements.items, item);
+          break;
+        }
+        case 'visitedItems': {
+          const { itemId } = apply.args[0];
+          updateItem(elements.items, itemId);
+          break;
+        }
+        case 'modal': {
+          const { itemId } = value;
+          const item = state.items.find(({ id }) => id === itemId);
+          renderModal(elements.modal, item);
+          break;
+        }
+      }
+    }
+  });
 };

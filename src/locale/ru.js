@@ -2,7 +2,7 @@ export default {
   translation: {
     feeds: {
       title: 'Фиды',
-      posts: {
+      items: {
         title: 'Посты',
         viewButton: 'Просмотр',
       },
