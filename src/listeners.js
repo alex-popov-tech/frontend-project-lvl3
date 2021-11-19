@@ -24,12 +24,8 @@ const addFormListener = (elements, state) =>
     const url = new FormData(event.target).get('url');
     const existingUrls = state.feeds.map(({ link }) => link);
     validateUrl(url, existingUrls)
-      .then(() => {
-        return pullRss(url);
-      })
-      .then((content) => {
-        return parseRss(content);
-      })
+      .then(() => pullRss(url))
+      .then((content) => parseRss(content))
       .then((feed) => {
         if (!state.feeds.find((it) => feed.link === it.link)) {
           state.form = {
@@ -67,12 +63,7 @@ const addFormListener = (elements, state) =>
 const addItemsListener = (elements, state) =>
   elements.items.addEventListener('click', (event) => {
     event.preventDefault();
-    const {
-      target: {
-        tagName,
-        dataset: { id, bsToggle },
-      },
-    } = event;
+    const { target: { tagName, dataset: { id, bsToggle } } } = event;
     if (tagName === 'BUTTON' && bsToggle === 'modal') {
       state.visitedItems.push({ itemId: id });
       state.modal = {
