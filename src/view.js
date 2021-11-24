@@ -1,7 +1,6 @@
 import onChange from 'on-change';
-import i18next from 'i18next';
 
-const updateForm = ({ feedback, url, submit }, formState) => {
+const updateForm = ({ feedback, url, submit }, formState, i18next) => {
   switch (formState.state) {
     case 'submitted':
       url.readOnly = true;
@@ -32,8 +31,8 @@ const updateForm = ({ feedback, url, submit }, formState) => {
   }
 };
 
-const renderFeed = (container, { id, title, description }) => {
-  if (id === '0') {
+const renderFeed = (container, { isFirst, id, title, description }, i18next) => {
+  if (isFirst) {
     const card = document.createElement('div');
     card.classList.add('card', 'border-0');
     container.append(card);
@@ -54,8 +53,8 @@ const renderFeed = (container, { id, title, description }) => {
   container.querySelector('ul').after(feedContainer);
 };
 
-const renderItem = (container, { id, title, link: href }) => {
-  if (id === '0') {
+const renderItem = (container, { isFirst, id, title, link: href }, i18next) => {
+  if (isFirst) {
     const card = document.createElement('div');
     card.classList.add('card', 'border-0');
     container.append(card);
@@ -107,26 +106,26 @@ const renderModal = ({ header, body, footerButton }, { title, link, description 
   footerButton.href = link;
 };
 
-export default (elements, state) => {
+export default (elements, state, i18next) => {
   const { modal, form, feeds, items } = elements;
 
   return onChange(state, (path, value, prev, apply) => {
     if (value) {
       switch (path) {
         case 'form': {
-          updateForm(elements.form, state.form);
+          updateForm(elements.form, state.form, i18next);
           break;
         }
         case 'feeds': {
           const feed = apply.args[0];
-          feed.id = `${state.feeds.length - 1}`;
-          renderFeed(elements.feeds, feed);
+          const isFirst = state.feeds.length === 1;
+          renderFeed(elements.feeds, { isFirst, ...feed}, i18next);
           break;
         }
         case 'items': {
           const item = apply.args[0];
-          item.id = `${state.items.length - 1}`;
-          renderItem(elements.items, item);
+          const isFirst = state.items.length === 1;
+          renderItem(elements.items, { isFirst, ...item}, i18next);
           break;
         }
         case 'visitedItems': {

@@ -25,11 +25,8 @@ export const parseRss = (content) => {
 
   return {
     link,
-
     title,
-
     description,
-
     items,
   };
 };

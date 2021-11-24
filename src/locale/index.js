@@ -3,7 +3,8 @@ import i18next from 'i18next';
 import ru from './ru';
 
 export default () => {
-  i18next.init({
+  const instance = i18next.createInstance();
+  instance.init({
     lng: 'ru', // if you're using a language detector, do not define the lng option
     debug: true,
     resources: {
@@ -12,10 +13,11 @@ export default () => {
   });
   setLocale({
     string: {
-      url: i18next.t('errors.url'),
+      url: instance.t('errors.url'),
     },
     mixed: {
-      notOneOf: i18next.t('errors.exists'),
+      notOneOf: instance.t('errors.exists'),
     },
   });
+  return instance;
 };

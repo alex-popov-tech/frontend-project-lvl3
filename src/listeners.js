@@ -1,4 +1,4 @@
-import axios from 'axios';
+import _ from 'lodash';
 import { pullRss, parseRss, validateUrl } from './helpers';
 
 const FEED_PULL_INTERVAL = 10 * 1000;
@@ -7,12 +7,13 @@ const getNewPosts = (pulledItems, existingItems) =>
   pulledItems.filter((pulledItem) => !existingItems.map(({ link }) => link).includes(pulledItem.link));
 
 const startUpdatingFeed = (state, url) =>
-  pullRss(url).then((content) => {
-    const source = parseRss(content);
-    const newPosts = getNewPosts(source.items, state.items);
-    newPosts.reverse().forEach((item) => state.items.unshift(item));
-    setTimeout(() => startUpdatingFeed(state, url), FEED_PULL_INTERVAL);
-  });
+  pullRss(url)
+    .then((content) => {
+      const source = parseRss(content);
+      const newPosts = getNewPosts(source.items, state.items);
+      newPosts.reverse().forEach((item) => state.items.unshift(item));
+    })
+    .finally(() => setTimeout(() => startUpdatingFeed(state, url), FEED_PULL_INTERVAL));
 
 const addFormListener = (elements, state) =>
   elements.form.container.addEventListener('submit', (event) => {
@@ -25,23 +26,23 @@ const addFormListener = (elements, state) =>
     const existingUrls = state.feeds.map(({ link }) => link);
     validateUrl(url, existingUrls)
       .then(() => pullRss(url))
-      .then((content) => parseRss(content))
-      .then((feed) => {
+      .then((content) => {
+        const feed = parseRss(content);
         if (!state.feeds.find((it) => feed.link === it.link)) {
           state.form = {
             message: 'success',
             state: 'valid',
           };
-          state.feeds.unshift(feed);
+          state.feeds.unshift({ id: _.uniqueId(), ...feed });
         }
 
         const newItems = getNewPosts(feed.items, state.items);
-        newItems.reverse().forEach((item) => state.items.unshift(item));
+        newItems.reverse().forEach((item) => state.items.unshift({ id: _.uniqueId(), ...item }));
 
         setTimeout(() => startUpdatingFeed(state, url), FEED_PULL_INTERVAL);
       })
       .catch((error) => {
-        if (axios.isAxiosError(error)) {
+        if (error.isAxiosError) {
           state.form = {
             message: 'errors.network',
             state: 'invalid',
@@ -63,7 +64,12 @@ const addFormListener = (elements, state) =>
 const addItemsListener = (elements, state) =>
   elements.items.addEventListener('click', (event) => {
     event.preventDefault();
-    const { target: { tagName, dataset: { id, bsToggle } } } = event;
+    const {
+      target: {
+        tagName,
+        dataset: { id, bsToggle },
+      },
+    } = event;
     if (tagName === 'BUTTON' && bsToggle === 'modal') {
       state.visitedItems.push({ itemId: id });
       state.modal = {

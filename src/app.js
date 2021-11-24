@@ -21,8 +21,8 @@ export default () => {
       footerButton: document.querySelector('#modal .full-article'),
     },
   };
-  initI18next();
+  const i18next = initI18next();
   const state = getState();
-  const watchedState = addStateListeners(elements, state);
+  const watchedState = addStateListeners(elements, state, i18next);
   addEventListeners(elements, watchedState);
 };
