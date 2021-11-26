@@ -31,7 +31,9 @@ const updateForm = ({ feedback, url, submit }, formState, i18next) => {
   }
 };
 
-const renderFeed = (container, { isFirst, id, title, description }, i18next) => {
+const renderFeed = (container, {
+  isFirst, title, description,
+}, i18next) => {
   if (isFirst) {
     const card = document.createElement('div');
     card.classList.add('card', 'border-0');
@@ -53,7 +55,9 @@ const renderFeed = (container, { isFirst, id, title, description }, i18next) => 
   container.querySelector('ul').after(feedContainer);
 };
 
-const renderItem = (container, { isFirst, id, title, link: href }, i18next) => {
+const renderItem = (container, {
+  isFirst, id, title, link: href,
+}, i18next) => {
   if (isFirst) {
     const card = document.createElement('div');
     card.classList.add('card', 'border-0');
@@ -74,7 +78,7 @@ const renderItem = (container, { isFirst, id, title, link: href }, i18next) => {
     'justify-content-between',
     'align-items-start',
     'border-0',
-    'border-end-0'
+    'border-end-0',
   );
   const link = document.createElement('a');
   link.classList.add('fw-bold');
@@ -106,40 +110,39 @@ const renderModal = ({ header, body, footerButton }, { title, link, description 
   footerButton.href = link;
 };
 
-export default (elements, state, i18next) => {
-  const { modal, form, feeds, items } = elements;
-
-  return onChange(state, (path, value, prev, apply) => {
-    if (value) {
-      switch (path) {
-        case 'form': {
-          updateForm(elements.form, state.form, i18next);
-          break;
-        }
-        case 'feeds': {
-          const feed = apply.args[0];
-          const isFirst = state.feeds.length === 1;
-          renderFeed(elements.feeds, { isFirst, ...feed}, i18next);
-          break;
-        }
-        case 'items': {
-          const item = apply.args[0];
-          const isFirst = state.items.length === 1;
-          renderItem(elements.items, { isFirst, ...item}, i18next);
-          break;
-        }
-        case 'visitedItems': {
-          const { itemId } = apply.args[0];
-          updateItem(elements.items, itemId);
-          break;
-        }
-        case 'modal': {
-          const { itemId } = value;
-          const item = state.items.find(({ id }) => id === itemId);
-          renderModal(elements.modal, item);
-          break;
-        }
+export default (elements, state, i18next) => onChange(state, (path, value, prev, apply) => {
+  if (value) {
+    switch (path) {
+      case 'form': {
+        updateForm(elements.form, state.form, i18next);
+        break;
+      }
+      case 'feeds': {
+        const feed = apply.args[0];
+        const isFirst = state.feeds.length === 1;
+        renderFeed(elements.feeds, { isFirst, ...feed }, i18next);
+        break;
+      }
+      case 'items': {
+        const item = apply.args[0];
+        const isFirst = state.items.length === 1;
+        renderItem(elements.items, { isFirst, ...item }, i18next);
+        break;
+      }
+      case 'visitedItems': {
+        const itemId = apply.args[0];
+        updateItem(elements.items, itemId);
+        break;
+      }
+      case 'modal': {
+        const { itemId } = value;
+        const item = state.items.find(({ id }) => id === itemId);
+        renderModal(elements.modal, item);
+        break;
+      }
+      default: {
+        throw new Error('Unhandled state access');
       }
     }
-  });
-};
+  }
+});
